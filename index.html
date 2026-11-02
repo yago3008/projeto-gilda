@@ -6,8 +6,8 @@
   <title>GILDA; · Gestão de peças e custos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Nunito+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styles.css">
-  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
   <div class="app">
@@ -24,19 +24,24 @@
       </nav>
       <div class="sidebar-rodape">
         <div id="usuario-atual"></div>
-        <button class="btn contorno mini" id="sair">Sair</button>
+        <div class="acoes-dados">
+          <button class="btn contorno mini" id="backup" title="Baixa um arquivo com todos os dados">Backup</button>
+          <button class="btn contorno mini" id="restaurar" title="Carrega um arquivo de backup">Restaurar</button>
+          <input type="file" id="arquivo-backup" accept="application/json,.json" hidden>
+        </div>
       </div>
     </aside>
     <div>
       <main class="conteudo" id="conteudo"></main>
       <footer class="rodape">
         <span>GILDA ALFAIATARIA LTDA · Curitiba/PR</span>
-        <span>Sistema de gestão de peças e custos · <a href="/docs" target="_blank">API</a></span>
+        <span>Sistema de gestão de peças e custos</span>
       </footer>
     </div>
   </div>
   <div id="modal-raiz"></div>
   <div class="toasts" id="toasts"></div>
-  <script src="/static/app.js"></script>
+  <script src="db.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

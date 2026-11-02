@@ -87,6 +87,7 @@ p { margin: 0 0 0.75rem; }
 .nav a .pv { font-family: var(--serifa); font-size: 1.1rem; line-height: 0; opacity: 0.6; }
 .sidebar-rodape { margin-top: auto; font-size: 0.75rem; color: var(--terracota); opacity: 0.9; padding: 0 0.6rem; }
 .sidebar-rodape button { color: var(--terracota); border-color: var(--terracota); margin-top: 0.5rem; }
+.acoes-dados { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 .hamburger { display: none; }
 
 .conteudo { padding: 2rem 2.6rem 4rem; max-width: 1400px; width: 100%; }

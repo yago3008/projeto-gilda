@@ -2,43 +2,27 @@
 
 Sistema web para a loja **GILDA;** (mundogilda.com.br) cadastrar cada peça, detalhar a composição de custo (tecido, botões, zíperes, etiquetas, aviamentos, mão de obra, embalagem, sacola…) e chegar automaticamente ao custo final e à margem de cada produto. Inclui painel com resumo, controle de estoque com histórico, exportação para CSV/Excel e cadastros totalmente modulares.
 
-Backend em **Python (FastAPI + SQLAlchemy + SQLite)**, frontend em HTML/CSS/JS puro com a identidade visual do site da marca, tudo empacotado em um container Docker chamado **projeto-gilda**.
+Versão **estática** (branch `estatico`): roda 100% no navegador, sem servidor nem banco. Publicada no GitHub Pages em https://yago3008.github.io/projeto-gilda/
 
-## Como rodar
+A versão original, com backend Python (FastAPI + SQLite) em Docker, continua na branch `main`.
 
-Pré-requisito: Docker Desktop instalado.
+## Como funciona sem servidor
 
-```bash
-cp .env.example .env        # ajuste usuário, senha e chave se quiser
-docker compose up -d --build
-```
+- O `db.js` reimplementa as rotas da antiga API em JavaScript e guarda tudo no `localStorage` do navegador. O `app.js` (a interface) é o mesmo da versão com servidor.
+- **Os dados ficam no navegador de quem usa.** Cada computador ou navegador tem os seus, e limpar os dados do site apaga tudo. Use **Backup** (baixa um `.json`) e **Restaurar** no rodapé do menu para guardar ou levar os dados para outro lugar.
+- Não há login: sem servidor não existe senha que proteja algo. Quem abre o link vê apenas os dados do próprio navegador.
+- Na primeira visita o sistema já vem com os cadastros base e as peças de exemplo.
+- A exportação para Excel carrega a biblioteca SheetJS da internet na hora do clique. Os CSVs são gerados localmente.
 
-Abra http://localhost:11111 e entre com o usuário e senha do `.env` (padrão `gilda` / `gilda123`).
+## Como rodar localmente
 
-Comandos úteis:
-
-```bash
-docker compose logs -f          # acompanhar os logs
-docker compose down             # parar (os dados ficam no volume projeto-gilda-dados)
-docker compose down -v          # parar e apagar os dados
-```
-
-Sem Docker, para desenvolver:
+Qualquer servidor de arquivos estáticos serve, por exemplo:
 
 ```bash
-pip install -r requirements.txt
-uvicorn app.main:app --reload
+python -m http.server 8000
 ```
 
-## Variáveis de ambiente (`.env`)
-
-| Variável | Padrão | Para quê |
-|---|---|---|
-| `GILDA_USER` / `GILDA_PASSWORD` | `gilda` / `gilda123` | login do sistema |
-| `GILDA_SECRET_KEY` | (aleatória) | assina o cookie de sessão; defina uma fixa para não deslogar a cada reinício |
-| `GILDA_SEED_EXEMPLO` | `1` | `1` cria peças e insumos de exemplo na primeira execução com banco vazio; `0` começa vazio |
-| `GILDA_PORT` | `11111` | porta exposta no computador |
-| `DATABASE_URL` | SQLite em `/data/gilda.db` | troque por PostgreSQL se um dia precisar |
+e abra http://localhost:8000.
 
 ## O que o sistema faz
 
@@ -56,35 +40,15 @@ uvicorn app.main:app --reload
 
 **Exportação.** Peças, composição de custos e insumos em CSV (separador `;`, pronto para o Excel brasileiro) e uma planilha Excel completa com três abas.
 
-## API
-
-A documentação interativa fica em http://localhost:11111/docs (precisa estar logado). Principais rotas:
-
-```
-POST /api/login · POST /api/logout · GET /api/me
-GET|POST /api/produtos · GET|PUT|DELETE /api/produtos/{id} · POST /api/produtos/{id}/duplicar
-GET|PUT|POST /api/produtos/{id}/custos · DELETE /api/produtos/{id}/custos/{item_id}
-GET|POST /api/insumos · GET|PUT|DELETE /api/insumos/{id}
-GET /api/estoque/movimentacoes · POST /api/estoque/produtos/{id}/movimentar
-GET|POST|PUT|DELETE /api/colecoes, /api/categorias, /api/categorias-insumo, /api/opcoes, /api/campos
-GET /api/dashboard
-GET /api/exportar/produtos.csv · /api/exportar/custos.csv · /api/exportar/insumos.csv · /api/exportar/completo.xlsx
-```
-
 ## Estrutura
 
 ```
-projeto-gilda/
-├── Dockerfile · docker-compose.yml · requirements.txt · .env.example
-└── app/
-    ├── main.py          # FastAPI, login, rotas do frontend
-    ├── database.py      # conexão (SQLite por padrão)
-    ├── models.py        # tabelas
-    ├── schemas.py       # validação de entrada/saída
-    ├── auth.py          # login simples por variável de ambiente
-    ├── seed.py          # cadastros base e dados de exemplo
-    ├── routers/         # produtos, insumos, estoque, cadastros, dashboard, exportar
-    └── static/          # index.html, login.html, app.js, styles.css
+projeto-gilda/  (branch estatico)
+├── index.html   # casca da SPA
+├── app.js       # interface (roteador por hash, telas, formulários)
+├── db.js        # "backend" no navegador: rotas, regras, dados de exemplo, exportação, backup
+├── styles.css · favicon.svg
+└── .nojekyll
 ```
 
 ## Identidade visual

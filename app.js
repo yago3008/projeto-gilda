@@ -18,16 +18,9 @@ const num = (v) => { const n = parseFloat(String(v).replace(',', '.')); return N
 const CORES_MAPA = { 'off-white': '#f3efe4', creme: '#e9e2c9', terracota: '#b4522d', marrom: '#5a3a24', preto: '#1f1a16', mostarda: '#ac8018', oliva: '#7c7455', azul: '#3d5a80', branco: '#ffffff', bege: '#d9d3c2', vermelho: '#8b1e12', verde: '#4c6b3c', rosa: '#e7b8b0', cinza: '#9a9a9a' };
 const bolinha = (cor) => { const c = CORES_MAPA[(cor || '').toLowerCase()]; return c ? `<span class="cor-bolinha" style="background:${c}"></span>` : ''; };
 
+// sem servidor: as rotas /api/... são atendidas pelo GildaDB (db.js), que guarda tudo no navegador
 async function api(url, opts = {}) {
-  const r = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...opts, body: opts.body ? JSON.stringify(opts.body) : undefined });
-  if (r.status === 401) { location.href = '/login'; throw new Error('Sessão expirada'); }
-  if (r.status === 204) return null;
-  const dados = await r.json().catch(() => ({}));
-  if (!r.ok) {
-    const msg = typeof dados.detail === 'string' ? dados.detail : (dados.detail?.[0]?.msg || 'Erro inesperado');
-    throw new Error(msg);
-  }
-  return dados;
+  return GildaDB.request(opts.method || 'GET', url, opts.body);
 }
 
 function toast(msg, tipo = 'ok') {
@@ -157,8 +150,8 @@ rota('pecas', async (query = '') => {
   conteudo.innerHTML = `
     ${cabecalho('Peças', `
       <div class="acoes">
-        <a class="btn suave" href="/api/exportar/produtos.csv">CSV</a>
-        <a class="btn suave" href="/api/exportar/completo.xlsx">Excel</a>
+        <button class="btn suave" data-exportar="produtos.csv">CSV</button>
+        <button class="btn suave" data-exportar="completo.xlsx">Excel</button>
         <a class="btn serifa" href="#/peca/nova">nova peça</a>
       </div>`, 'Catálogo')}
     <div class="filtros">
@@ -421,7 +414,7 @@ rota('insumos', async () => {
   await carregarCadastros();
   const estado = { q: '', categoria_id: '' };
   conteudo.innerHTML = `
-    ${cabecalho('Insumos', `<a class="btn suave" href="/api/exportar/insumos.csv">CSV</a><button class="btn serifa" id="b-novo">novo insumo</button>`, 'Catálogo de custos')}
+    ${cabecalho('Insumos', `<button class="btn suave" data-exportar="insumos.csv">CSV</button><button class="btn serifa" id="b-novo">novo insumo</button>`, 'Catálogo de custos')}
     <p class="muted" style="max-width:720px">Aqui ficam tecidos, botões, zíperes, etiquetas, aviamentos, mão de obra, embalagens e sacolas com o valor unitário padrão. Ao montar a composição de uma peça, escolher um insumo preenche a descrição, a unidade e o valor automaticamente.</p>
     <div class="filtros">
       <div class="campo busca"><label>Buscar</label><input type="search" id="f-q" placeholder="nome ou fornecedor"></div>
@@ -595,8 +588,19 @@ rota('cadastros', async (aba = 'colecoes') => {
 
 // ---------- inicialização ----------
 (async () => {
-  try { const me = await api('/api/me'); $('#usuario-atual').textContent = `Olá, ${me.usuario}`; } catch { return; }
-  $('#sair').onclick = async () => { await api('/api/logout', { method: 'POST' }); location.href = '/login'; };
+  $('#usuario-atual').textContent = GildaDB.persistente ? 'Dados salvos neste navegador' : 'Atenção: este navegador não está guardando os dados';
+  document.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-exportar]');
+    if (!b) return;
+    try { await GildaDB.exportar(b.dataset.exportar); } catch (err) { toast(err.message, 'erro'); }
+  });
+  $('#backup').onclick = () => { GildaDB.backup(); toast('Backup baixado'); };
+  $('#restaurar').onclick = () => $('#arquivo-backup').click();
+  $('#arquivo-backup').onchange = async (e) => {
+    const arq = e.target.files[0]; e.target.value = '';
+    if (!arq || !(await confirmar('Restaurar este backup? Os dados atuais deste navegador serão substituídos.', { titulo: 'Restaurar backup', botao: 'Restaurar' }))) return;
+    try { GildaDB.restaurar(await arq.text()); toast('Backup restaurado'); navegar(); } catch (err) { toast(err.message, 'erro'); }
+  };
   $('#hamburger').onclick = () => $('#nav').classList.toggle('aberto');
   navegar();
 })();
