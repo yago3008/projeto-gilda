@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrar · GILDA;</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Nunito+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <div class="login-pagina">
+    <aside class="login-faixa"><div class="marca-vertical">GILDA ;</div></aside>
+    <main class="login-conteudo">
+      <div class="login-card">
+        <div class="eyebrow">Gestão de peças e custos</div>
+        <h1>Bem-vinda<span style="color:var(--mostarda)">;</span></h1>
+        <p class="muted">Entre para cadastrar peças, insumos e acompanhar a composição de custo de cada produto.</p>
+        <form id="form-login">
+          <div class="campo">
+            <label for="usuario">Usuário</label>
+            <input id="usuario" name="usuario" type="text" autocomplete="username" required autofocus>
+          </div>
+          <div class="campo">
+            <label for="senha">Senha</label>
+            <input id="senha" name="senha" type="password" autocomplete="current-password" required>
+          </div>
+          <div id="erro" class="erro-campo" hidden></div>
+          <button class="btn serifa" type="submit">entrar</button>
+        </form>
+      </div>
+    </main>
+  </div>
+  <script>
+    document.getElementById('form-login').addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const erro = document.getElementById('erro');
+      erro.hidden = true;
+      const dados = { usuario: usuario.value.trim(), senha: senha.value };
+      const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dados) });
+      if (r.ok) { location.href = '/'; return; }
+      erro.textContent = (await r.json()).detail || 'Não foi possível entrar.';
+      erro.hidden = false;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+services:
+  gilda:
+    build: .
+    image: projeto-gilda:latest
+    container_name: projeto-gilda
+    restart: unless-stopped
+    ports:
+      - "${GILDA_PORT:-11111}:8000"
+    env_file:
+      - .env
+    volumes:
+      - gilda-dados:/data
+
+volumes:
+  gilda-dados:
+    name: projeto-gilda-dados

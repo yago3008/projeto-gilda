@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GILDA; · Gestão de peças e custos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Nunito+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="marca" href="#/">GILDA<span class="pv">;</span></a>
+      <div class="marca-sub">Alfaiataria · Gestão</div>
+      <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      <nav class="nav" id="nav">
+        <a href="#/" data-rota="painel">Painel <span class="pv">;</span></a>
+        <a href="#/pecas" data-rota="pecas">Peças <span class="pv">;</span></a>
+        <a href="#/insumos" data-rota="insumos">Insumos <span class="pv">;</span></a>
+        <a href="#/estoque" data-rota="estoque">Estoque <span class="pv">;</span></a>
+        <a href="#/cadastros" data-rota="cadastros">Cadastros <span class="pv">;</span></a>
+      </nav>
+      <div class="sidebar-rodape">
+        <div id="usuario-atual"></div>
+        <button class="btn contorno mini" id="sair">Sair</button>
+      </div>
+    </aside>
+    <div>
+      <main class="conteudo" id="conteudo"></main>
+      <footer class="rodape">
+        <span>GILDA ALFAIATARIA LTDA · Curitiba/PR</span>
+        <span>Sistema de gestão de peças e custos · <a href="/docs" target="_blank">API</a></span>
+      </footer>
+    </div>
+  </div>
+  <div id="modal-raiz"></div>
+  <div class="toasts" id="toasts"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
